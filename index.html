@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Savol-Javob</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; }
+    textarea, button { width: 100%; margin-top: 10px; padding: 10px; font-size: 16px; }
+    #response { margin-top: 20px; white-space: pre-wrap; border-top: 1px solid #ccc; padding-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>🤖 AI Savol-Javob</h2>
+  <textarea id="prompt" rows="4" placeholder="Savolingizni yozing..."></textarea>
+  <button onclick="askAI()">Yuborish</button>
+  <div id="response"></div>
+
+  <script>
+    async function askAI() {
+      const prompt = document.getElementById('prompt').value;
+      const responseDiv = document.getElementById('response');
+      responseDiv.innerText = "⏳ Javob olinmoqda...";
+
+      const res = await fetch("https://api.blackbox.ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer sk-S27oqIa8_qwGjvBMMYAfLw"
+        },
+        body: JSON.stringify({
+          model: "blackboxai/deepseek/deepseek-v3-base:free",
+          messages: [
+            { role: "user", content: prompt }
+          ]
+        })
+      });
+
+      const data = await res.json();
+      if (data && data.choices && data.choices.length > 0) {
+        responseDiv.innerText = data.choices[0].message.content;
+      } else {
+        responseDiv.innerText = "❌ Javob olinmadi yoki xatolik yuz berdi.";
+      }
+    }
+  </script>
+</body>
+</html>
