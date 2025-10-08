@@ -1,48 +1,168 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Savol-Javob</title>
-  <style>
-    body { font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; }
-    textarea, button { width: 100%; margin-top: 10px; padding: 10px; font-size: 16px; }
-    #response { margin-top: 20px; white-space: pre-wrap; border-top: 1px solid #ccc; padding-top: 10px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PUBG Mobile UC Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h2>🤖 AI Savol-Javob</h2>
-  <textarea id="prompt" rows="4" placeholder="Savolingizni yozing..."></textarea>
-  <button onclick="askAI()">Yuborish</button>
-  <div id="response"></div>
+<body class="min-h-screen bg-gradient-to-br from-orange-500 via-red-500 to-purple-600 p-4">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-t-3xl shadow-2xl p-6 mt-8">
+      <div class="flex items-center justify-center gap-3 mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="text-orange-500" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="21" r="1"></circle>
+          <circle cx="19" cy="21" r="1"></circle>
+          <path d="M2 3h2l3.6 7.59a1 1 0 0 0 .9.41h8.72a1 1 0 0 0 .98-.8l1.38-6.6H6"></path>
+        </svg>
+        <h1 class="text-3xl font-bold text-gray-800">PUBG Mobile UC</h1>
+      </div>
+      <p class="text-center text-gray-600">Tez va ishonchli UC yetkazib berish</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="app" class="bg-white shadow-2xl p-8 rounded-b-3xl mb-8"></div>
+
+    <!-- Footer -->
+    <div class="text-center text-white">
+      <p class="text-sm opacity-90 mb-3">
+        ⚡ Tez yetkazib berish | 🔒 Ishonchli xizmat | 💯 Kafolat
+      </p>
+      <p class="text-xs opacity-75">
+        Yaratildi: <span class="font-semibold">SpectraSoft Team</span> tomonidan
+      </p>
+    </div>
+  </div>
 
   <script>
-    async function askAI() {
-      const prompt = document.getElementById('prompt').value;
-      const responseDiv = document.getElementById('response');
-      responseDiv.innerText = "⏳ Javob olinmoqda...";
+    const ucOptions = [
+      { amount: 60, price: "13,000" },
+      { amount: 120, price: "26,000" },
+      { amount: 325, price: "70,000" },
+      { amount: 660, price: "143,000" },
+      { amount: 1800, price: "390,000" },
+    ];
 
-      const res = await fetch("https://api.blackbox.ai/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer "
-        },
-        body: JSON.stringify({
-          model: "blackboxai/deepseek/deepseek-v3-base:free",
-          messages: [
-            { role: "user", content: prompt }
-          ]
-        })
-      });
+    const cashiers = [
+      { name: "Kassir 1", id: "ravshan" },
+      { name: "Kassir 2", id: "shaxobiddin" },
+    ];
 
-      const data = await res.json();
-      if (data && data.choices && data.choices.length > 0) {
-        responseDiv.innerText = data.choices[0].message.content;
-      } else {
-        responseDiv.innerText = "❌ Javob olinmadi yoki xatolik yuz berdi.";
-      }
+    let step = 1;
+    let selectedUc = null;
+
+    function isCashierAvailable(cashierId) {
+      const now = new Date();
+      const day = now.getDate();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const currentTime = hours + minutes / 60;
+
+      const isEvenDay = day % 2 === 0;
+      const isOddDay = day % 2 === 1;
+
+      if (isEvenDay && currentTime >= 8 && currentTime < 16.5) return false;
+      if (isOddDay && currentTime >= 8 && currentTime < 14) return false;
+
+      return true;
     }
+
+    function renderStep1() {
+      const app = document.getElementById("app");
+      app.innerHTML = `
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+          UC miqdorini tanlang
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${ucOptions.map(uc => `
+            <button 
+              class="bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600 text-white rounded-2xl p-6 transform hover:scale-105 transition-all duration-200 shadow-lg"
+              onclick="selectUc(${uc.amount}, '${uc.price}')"
+            >
+              <div class="text-4xl font-bold mb-2">${uc.amount} UC</div>
+              <div class="text-xl">${uc.price} so'm</div>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderStep2() {
+      const app = document.getElementById("app");
+      app.innerHTML = `
+        <button onclick="goBack()" class="mb-6 text-orange-500 hover:text-orange-600 font-semibold">
+          ← Orqaga
+        </button>
+
+        <div class="bg-orange-50 rounded-xl p-4 mb-6">
+          <h3 class="font-semibold text-gray-700 mb-2">Tanlangan paket:</h3>
+          <div class="text-2xl font-bold text-orange-600">
+            ${selectedUc.amount} UC - ${selectedUc.price} so'm
+          </div>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Kassirni tanlang
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${cashiers.map(cashier => {
+            const available = isCashierAvailable(cashier.id);
+            return `
+              <button 
+                class="${available
+                  ? 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 transform hover:scale-105'
+                  : 'bg-gray-300 cursor-not-allowed opacity-60'
+                } text-white rounded-2xl p-8 transition-all duration-200 shadow-lg flex flex-col items-center gap-3"
+                ${available ? `onclick="selectCashier('${cashier.id}', '${cashier.name}')"` : 'disabled'}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 15 0"/></svg>
+                <div class="text-2xl font-bold">${cashier.name}</div>
+                ${available
+                  ? `<div class="flex items-center gap-2 text-sm opacity-90">
+                      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='currentColor' stroke-width='2'><rect width='12' height='12' x='8' y='8' rx='2' ry='2'/><path d='M4 16H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2'/></svg>
+                      <span>Nusxa olish va Telegram</span>
+                      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='currentColor' stroke-width='2'><line x1='22' y1='2' x2='11' y2='13'/><polygon points='22 2 15 22 11 13 2 9 22 2'/></svg>
+                    </div>`
+                  : `<div class="text-sm font-semibold bg-red-500 px-3 py-1 rounded-full">Hozir band</div>`
+                }
+              </button>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="mt-6 p-4 bg-blue-50 rounded-xl">
+          <p class="text-sm text-gray-600 text-center">
+            💡 Kassirni tanlaganingizdan so'ng, buyurtma ma'lumotlari avtomatik nusxa olinadi va Telegram ochiladi
+          </p>
+        </div>
+      `;
+    }
+
+    function selectUc(amount, price) {
+      selectedUc = { amount, price };
+      step = 2;
+      renderStep2();
+    }
+
+    function goBack() {
+      step = 1;
+      renderStep1();
+    }
+
+    function selectCashier(id, name) {
+      const message = `🎮 PUBG Mobile UC Buyurtma\n\n💎 Tanlangan paket: ${selectedUc.amount} UC\n💰 Narx: ${selectedUc.price} so'm\n👤 Kassir: ${name}\n\n✅ Buyurtmani tasdiqlash uchun telegram orqali bog'laning!`;
+
+      navigator.clipboard.writeText(message).then(() => {
+        const telegramUrl = id === "shaxobiddin"
+          ? "https://t.me/955801066"
+          : "https://t.me/S0_FTT";
+        window.open(telegramUrl, "_blank");
+      });
+    }
+
+    renderStep1();
   </script>
 </body>
 </html>
